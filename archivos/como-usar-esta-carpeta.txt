@@ -1,0 +1,9 @@
+Almacena esta carpeta en la raíz de un servidor Apache o compatible con PHP usando un una estructura similar a ésta:
+
+-RAIZ DEL SERVIDOR
+--archivos
+--servicios(scripts php)
+
+
+
+Los archivos que se encuentran en esta carpeta, se pueden leer desde los archivos que se encuentran en la carpeta "servicios".

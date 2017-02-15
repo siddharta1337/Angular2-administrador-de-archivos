@@ -1,0 +1,33 @@
+<div *ngIf="!edicionActiva">
+    <i class="fa {{itemInfo.tipo | filtroExtension }}" aria-hidden="true"></i> {{itemInfo.nombre}}
+
+    <span *ngIf="itemInfo.tipo!='dir'">{{itemInfo.tamano}} </span>
+
+    <span class="herramientas">
+
+        <span *ngIf="itemInfo.tipo!='dir'">
+            <span class="item editar"> 
+            <i class="fa fa-pencil" aria-hidden="true" (click)="activarEdicion(itemInfo.nombre)" ></i>
+            </span>
+
+    <span class="item borrar"> 
+                <i class="fa fa-trash" aria-hidden="true" (click)="borrar(itemInfo)" ></i>
+            </span>
+
+    </span>
+    <span *ngIf="itemInfo.tipo=='dir'">
+            <span class="item borrar"> 
+                <i class="fa fa-arrow-right" aria-hidden="true" (click)="nuevaRuta(itemInfo)"></i>
+               
+            </span>
+    </span>
+
+    </span>
+
+</div>
+
+<div *ngIf="edicionActiva">
+    <input type="text" [(ngModel)]="modeloItem.nuevoNombre">
+    <button (click)="renombrar(itemInfo)"> OK </button>
+    <button (click)="desactivarEdicion()"> Cancelar</button>
+</div>

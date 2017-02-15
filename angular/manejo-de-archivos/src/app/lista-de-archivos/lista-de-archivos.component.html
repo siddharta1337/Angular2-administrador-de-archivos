@@ -1,0 +1,26 @@
+<button type="button" class="btn btn-danger" *ngIf="mostrarSuperior()" (click)=" irASuperior()">
+<i class="fa fa-level-up" aria-hidden="true"></i> nivel superior
+</button>
+
+<ul class="list-unstyled">
+
+
+  <li *ngFor="let item of archivos" class="container">
+    <app-item-archivo [itemInfo]="item" (cambioArchivo)="refrescar()"> </app-item-archivo>
+  </li>
+
+</ul>
+
+
+<form id="formulario-video" (ngSubmit)="onSubmit(miFormulario)" #miFormulario="ngForm">
+  <label class="upload-button is-pulled-left">
+        <input type="file"
+              class="hidden"
+              ngFileSelect
+              [options]="options"
+              [events]="inputUploadEvents"
+              (onUpload)="handleUpload($event)" >
+              Seleccionar Imagen
+      </label>
+  <input type="submit" />
+</form>
