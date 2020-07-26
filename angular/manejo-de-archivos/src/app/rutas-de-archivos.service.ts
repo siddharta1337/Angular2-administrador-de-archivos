@@ -1,39 +1,32 @@
 import { Injectable } from '@angular/core';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class RutasDeArchivosService {
 
-  ruta: String;
-  rutaOriginal: String;
-
+  rutaOriginal: string;
+  ruta:string;
 
   constructor() { }
 
-
   definirRuta(ruta) {
-
     if (!this.ruta) {
       this.rutaOriginal = ruta;
     }
-
     this.ruta = ruta;
   }
 
-
-  obtenerRuta(): String {
+  obtenerRuta(): string {
     return this.ruta;
   }
 
-
   obtenerSuperior(): any {
-
-    if (this.ruta != this.rutaOriginal) {
+    if (this.ruta !== this.rutaOriginal) {
       return this.ruta.substr(0, this.ruta.lastIndexOf('/'));
     } else {
       return false;
     }
-
   }
-
-
+  
 }

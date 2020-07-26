@@ -1,8 +1,7 @@
-import { Component, OnInit, EventEmitter, NgZone, Inject } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { RutasDeArchivosService } from '../rutas-de-archivos.service';
-import { NgUploaderOptions, UploadedFile, UploadRejected } from 'ngx-uploader';
-
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import {  RutasDeArchivosService } from '../rutas-de-archivos.service';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-lista-de-archivos',
@@ -11,101 +10,60 @@ import { NgUploaderOptions, UploadedFile, UploadRejected } from 'ngx-uploader';
 })
 export class ListaDeArchivosComponent implements OnInit {
 
-  archivos: Array<Object>;
-  options: NgUploaderOptions;
-  miModelo: any = {};
-  inputUploadEvents: EventEmitter<string>;
-  response: any;
+  archivos: Array<object>;
+  extensionesPermitidas =  ['.jpg', '.png', '.gif'];
+  archivoSeleccionado: File = null;
 
+  constructor(private http:HttpClient , private rutasDeArchivos: RutasDeArchivosService) { }
 
-
-
-
-  //private router: Router, private route: ActivatedRoute,  ) {
-
-  constructor(private http: Http, @Inject(NgZone) private zone: NgZone, private rutasDeArchivosService: RutasDeArchivosService) {
-
-    this.options = new NgUploaderOptions({
-      url: 'http://localhost/servicios/guardar-archivo.php',
-      data: this.miModelo,
-      filterExtensions: true,
-      allowedExtensions: ['jpg', 'png', 'gif'],
-      autoUpload: false,
-      fieldName: 'file',
-      fieldReset: true,
-      maxUploads: 2,
-      method: 'POST',
-      previewUrl: true,
-      withCredentials: false
-    });
-
-    this.inputUploadEvents = new EventEmitter<string>();
-
-
-
-    this.rutasDeArchivosService.definirRuta('../archivos');
+  ngOnInit(): void {
+    this.rutasDeArchivos.definirRuta('../archivos');
+    this.peticionExterna();
   }
 
-  mostrarRuta(): String {
-    return this.rutasDeArchivosService.obtenerRuta();
+  mostrarRuta(): string {
+    return this.rutasDeArchivos.obtenerRuta();
   }
-
 
   mostrarSuperior() {
-    return this.rutasDeArchivosService.obtenerSuperior();
+    return this.rutasDeArchivos.obtenerSuperior();
   }
 
-  irASuperior() {
-    this.rutasDeArchivosService.definirRuta(this.mostrarSuperior());
+  irASuperior(){
+    this.rutasDeArchivos.definirRuta(this.mostrarSuperior());
     this.peticionExterna();
   }
 
+  peticionExterna():void{
 
+    const data = {
+      'ruta' : this.mostrarRuta()
+    }
 
-  ngOnInit() {
+    this.http.get('http://localhost/servicios/leer-carpeta.php', {params:data} ).subscribe( (respuesta:Array<object>) => {
+      this.archivos = respuesta;
+    })
+  }
 
+  refrescar(){
     this.peticionExterna();
   }
 
-  refrescar(): void {
-    this.peticionExterna();
+  onFileSelected(event) {
+    this.archivoSeleccionado = event.target.files[0];
   }
 
 
+  onSubmit( data:any){
 
+    const fd = new FormData();
+    fd.append( 'file' , this.archivoSeleccionado );
+    this.http.post('http://localhost/servicios/guardar-archivo.php', fd ).subscribe( () => {
+       this.peticionExterna();
+    })
 
-
-  peticionExterna(): void {
-
-    this.miModelo.ruta = this.mostrarRuta();
-
-    this.http.request('http://localhost/servicios/leer-carpeta.php?ruta=' + this.mostrarRuta())
-      .subscribe((res: Response) => {
-
-        this.archivos = res.json();
-      })
-  }
-
-  onSubmit(f: any): void {
-
-    this.inputUploadEvents.emit('startUpload');
 
   }
-
-
-  handleUpload(data: any) {
-
-    setTimeout(() => {
-      this.zone.run(() => {
-        this.response = data;
-        if (data && data.response) {
-          this.peticionExterna();
-        }
-      });
-    });
-  }
-
-
 
 
 }

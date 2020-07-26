@@ -1,93 +1,68 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Http, Response, RequestMethod, Request, URLSearchParams } from '@angular/http';
-import { RutasDeArchivosService } from '../rutas-de-archivos.service';
+import { HttpClient } from '@angular/common/http';
+import {  RutasDeArchivosService } from '../rutas-de-archivos.service';
 
 @Component({
   selector: 'app-item-archivo',
   templateUrl: './item-archivo.component.html',
   styleUrls: ['./item-archivo.component.css']
 })
-
 export class ItemArchivoComponent implements OnInit {
 
   @Input()
-  itemInfo: any;
+  itemInfo:any
 
   @Output()
   cambioArchivo: EventEmitter<number> = new EventEmitter();
 
-  edicionActiva: Boolean;
+  edicionActiva: boolean;
 
-  modeloItem: any;
+  modeloItem:string;
 
-  constructor(private http: Http, private rutasDeArchivo: RutasDeArchivosService) {
-    this.modeloItem = {}
-
+  constructor(private http:HttpClient , private rutasDeArchivos:RutasDeArchivosService) { 
+    
   }
 
-  nuevaRuta(): void {
-    this.rutasDeArchivo.definirRuta('../archivos/test2');
-    this.cambioArchivo.emit();
+  ngOnInit(): void {
   }
 
+  borrar(item){
 
+    const detalles = {
+      'ruta-archivo' : item.ruta + "/" + item.nombre
+    }
 
-
-
-
-  ngOnInit() {
+    this.http.get('http://localhost/servicios/borrar-archivos.php' , { params : detalles} ).subscribe( ()=>{
+        this.cambioArchivo.emit()
+    }) 
   }
 
-  borrar(item): void {
-
-    this.http.request(
-      new Request({
-        method: RequestMethod.Get,
-        url: 'http://localhost/servicios/borrar-archivos.php',
-        search: 'ruta-archivo=' + item.ruta + '/' + item.nombre
-      })
-
-    ).subscribe((res: Response) => {
-
-      this.cambioArchivo.emit();
-
-    })
-
-  }
-
-
-  activarEdicion(nombre: string): void {
+  activarEdicion(nombre:string): void {
+    this.modeloItem = nombre;
     this.edicionActiva = true;
-    this.modeloItem.nuevoNombre = nombre;
-
   }
 
   desactivarEdicion(): void {
     this.edicionActiva = false;
   }
 
+  renombrar(item):void{
+    const detalles = {
+      'ruta-archivo' : item.ruta + "/" + item.nombre,
+      'nuevo-archivo' : item.ruta + "/" +  this.modeloItem
+    }
 
-  renombrar(item): void {
-
-    let parametros: URLSearchParams = new URLSearchParams();
-
-    parametros.set('ruta-archivo', item.ruta + '/' + item.nombre);
-    parametros.set('nuevo-archivo', item.ruta + '/' + this.modeloItem.nuevoNombre);
-
-
-    this.http.request(
-      new Request({
-        method: RequestMethod.Get,
-        url: 'http://localhost/servicios/renombrar-archivos.php',
-        search: parametros
-      })
-
-    ).subscribe((res: Response) => {
-
-      this.cambioArchivo.emit();
-
-    })
-
+    this.http.get('http://localhost/servicios/renombrar-archivos.php' , { params : detalles} ).subscribe( ()=>{
+        this.cambioArchivo.emit()
+    }) 
   }
+
+
+
+  nuevaRuta(item): void {
+    this.rutasDeArchivos.definirRuta(item.ruta + '/' + item.nombre);
+    this.cambioArchivo.emit();
+  }
+
 
 }

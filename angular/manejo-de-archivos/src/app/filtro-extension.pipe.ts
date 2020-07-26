@@ -18,6 +18,10 @@ export class FiltroExtensionPipe implements PipeTransform {
         break;
       case 'jpg':
         iconoClase = 'fa-file-image-o';
+      case 'gif':
+        iconoClase = 'fa-file-image-o';
+      case 'png':
+        iconoClase = 'fa-file-image-o';
         break;
       case "pptx":
         iconoClase = 'fa-file-powerpoint-o';
